@@ -8,23 +8,29 @@ function App() {
     "access_token"
   );
 
-  const instanceUrl = "https://orgfarm-6e89951539-dev-ed.develop.my.salesforce.com";
+  // Your deployed backend URL
+  const BACKEND_URL =
+    "https://salesforce-backend-21qw.onrender.com";
+
+  const instanceUrl =
+    "https://orgfarm-6e89951539-dev-ed.develop.my.salesforce.com";
 
   const getValidationRules = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/validation-rules?access_token=${accessToken}`
+        `${BACKEND_URL}/validation-rules?access_token=${accessToken}`
       );
 
       setRules(response.data);
     } catch (error) {
       console.log(error);
+      alert("Failed to fetch validation rules");
     }
   };
 
   const toggleRule = async (ruleId, currentStatus) => {
     try {
-      await axios.post("http://localhost:5000/toggle-rule", {
+      await axios.post(`${BACKEND_URL}/toggle-rule`, {
         accessToken,
         instanceUrl,
         ruleId,
@@ -34,6 +40,7 @@ function App() {
       getValidationRules();
     } catch (error) {
       console.log(error);
+      alert("Failed to update validation rule");
     }
   };
 
@@ -43,60 +50,99 @@ function App() {
         textAlign: "center",
         padding: "30px",
         fontFamily: "Arial",
+        backgroundColor: "#f4f6f9",
+        minHeight: "100vh",
       }}
     >
-      <h1>Salesforce Validation Rule Manager</h1>
+      <h1
+        style={{
+          marginBottom: "30px",
+          color: "#0176d3",
+        }}
+      >
+        Salesforce Validation Rule Manager
+      </h1>
 
       <button
         onClick={getValidationRules}
         style={{
-          padding: "10px 20px",
+          padding: "12px 25px",
           marginBottom: "30px",
           cursor: "pointer",
+          backgroundColor: "#0176d3",
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          fontSize: "16px",
         }}
       >
         Get Validation Rules
       </button>
 
-      {rules.map((rule) => (
-        <div
-          key={rule.Id}
-          style={{
-            border: "1px solid lightgray",
-            padding: "20px",
-            marginBottom: "20px",
-            borderRadius: "10px",
-            width: "400px",
-            margin: "20px auto",
-          }}
-        >
-          <h2>{rule.ValidationName}</h2>
-
-          <p>
-            <strong>Object:</strong>{" "}
-            {rule.EntityDefinition.QualifiedApiName}
-          </p>
-
-          <p>
-            <strong>Status:</strong>{" "}
-            {rule.Active ? "Active" : "Inactive"}
-          </p>
-
-          <button
-            onClick={() => toggleRule(rule.Id, rule.Active)}
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: "20px",
+        }}
+      >
+        {rules.map((rule) => (
+          <div
+            key={rule.Id}
             style={{
-              padding: "10px 15px",
-              backgroundColor: rule.Active ? "red" : "green",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
+              border: "1px solid #ddd",
+              padding: "20px",
+              borderRadius: "12px",
+              width: "320px",
+              backgroundColor: "white",
+              boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
             }}
           >
-            {rule.Active ? "Deactivate" : "Activate"}
-          </button>
-        </div>
-      ))}
+            <h2
+              style={{
+                color: "#333",
+                marginBottom: "15px",
+              }}
+            >
+              {rule.ValidationName}
+            </h2>
+
+            <p>
+              <strong>Object:</strong>{" "}
+              {rule.EntityDefinition.QualifiedApiName}
+            </p>
+
+            <p>
+              <strong>Status:</strong>{" "}
+              <span
+                style={{
+                  color: rule.Active ? "green" : "red",
+                  fontWeight: "bold",
+                }}
+              >
+                {rule.Active ? "Active" : "Inactive"}
+              </span>
+            </p>
+
+            <button
+              onClick={() => toggleRule(rule.Id, rule.Active)}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: rule.Active ? "#dc3545" : "#28a745",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                marginTop: "10px",
+                fontWeight: "bold",
+              }}
+            >
+              {rule.Active ? "Deactivate" : "Activate"}
+            </button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
